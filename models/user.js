@@ -1,4 +1,5 @@
 const fs = require('fs')
+const bcrypt = require('bcrypt')
 
 // const user = {
 //     firstname: "abc",
@@ -24,9 +25,13 @@ const loadJSON = () => {
         //JSON.parse(dataJSON) = { username: 'user2', ...
     }
     catch(e) {
-        console.log(e)
+        //console.log(e)
         return []
     }
+}
+
+const hashPasword = (password) => {
+    return bcrypt.hashSync(password, 8)
 }
 
 const saveUser = (user) => {
@@ -35,7 +40,7 @@ const saveUser = (user) => {
         firstname: user.firstname,
         lastname: user.lastname,
         username: user.username,
-        password: user.password,
+        password: hashPasword(user.password),
     })
 
     saveJSON(data)
@@ -59,8 +64,8 @@ const signin = (user) => {
     if(match === -1) {
         return "No Such User"
     }
-
-    if(data[match].password !== user.password){
+    
+    if(!bcrypt.compareSync(user.password, data[match].password)){
         return "Invalid Password"
     }
 
